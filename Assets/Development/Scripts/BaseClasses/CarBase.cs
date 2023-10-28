@@ -1,15 +1,13 @@
 ﻿using Development.Scripts.ScriptableObjects;
 using Dreamteck.Splines;
 using UnityEngine;
+using Sirenix.OdinInspector;
 
 namespace Development.Scripts.BaseClasses
 {
     [RequireComponent(typeof(SplineFollower))]
     public abstract class CarBase : MonoBehaviour
     {
-        [Header("Car Initialization Data")]
-        [Space(5)]
-
         [SerializeField] private CarData carData;
 
         protected SplineFollower SplineFollower { get; private set; }

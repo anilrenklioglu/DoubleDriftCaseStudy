@@ -1,5 +1,4 @@
-﻿using System;
-using DG.Tweening;
+﻿using DG.Tweening;
 using Development.Scripts.BaseClasses;
 using Development.Scripts.Utilities;
 using UnityEngine;
@@ -8,21 +7,21 @@ namespace Development.Scripts.PlayerCar
 {
     public class PlayerCarController : CarBase
     {
-        // Variables for car movement
+       [Header("Variables and references for movement")]
+       [Space(4)]
+       
         [SerializeField] private GameObject carBody; 
-
-        [Header("Car Control for Drifting")]
+        [SerializeField] private GameObject carLeftTire;
+        [SerializeField] private GameObject carRightTire;
         [SerializeField] private float xMoveSpeed =0.1f; // Maximum angle the car can reach while drifting.
         
-        [Header("Car Control for Drifting")]
+        
+        [Header("Variables for drifting")]
+        [Space(4)]
+        
         [SerializeField] private float maxDriftAngle = 25f; // Maximum angle the car can reach while drifting.
         [SerializeField] private float rotationDuration = 0.3f; // How quickly the car reaches the maximum drift angle.
         [SerializeField] private Ease rotationEase = Ease.OutQuart; // Type of easing for the rotation animation.
-
-        [Header("Car Tires")] 
-        [SerializeField] private GameObject carLeftTire;
-        [SerializeField] private GameObject carRightTire;
-        
         
         // Internal variables for handling movement
         private InputReader _inputReader;
@@ -82,7 +81,7 @@ namespace Development.Scripts.PlayerCar
 
             if (inputX != 0)
             {
-                float tireRotationAngle = inputX > 0 ? -25f : 25f; // Angles for tire rotation based on input direction.
+                float tireRotationAngle = inputX > 0 ? 35f : -35f; // Angles for tire rotation based on input direction.
         
                 carLeftTire.transform.DOLocalRotate(new Vector3(0f, tireRotationAngle, 0f), rotationDuration).SetEase(rotationEase);
                 carRightTire.transform.DOLocalRotate(new Vector3(0f, tireRotationAngle, 0f), rotationDuration).SetEase(rotationEase);
