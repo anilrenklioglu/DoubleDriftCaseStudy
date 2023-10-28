@@ -12,6 +12,9 @@ namespace Development.Scripts.PlayerCar
         [SerializeField] private GameObject carBody; 
 
         [Header("Car Control for Drifting")]
+        [SerializeField] private float xMoveSpeed =0.1f; // Maximum angle the car can reach while drifting.
+        
+        [Header("Car Control for Drifting")]
         [SerializeField] private float maxDriftAngle = 25f; // Maximum angle the car can reach while drifting.
         [SerializeField] private float rotationDuration = 0.3f; // How quickly the car reaches the maximum drift angle.
         [SerializeField] private Ease rotationEase = Ease.OutQuart; // Type of easing for the rotation animation.
@@ -92,7 +95,7 @@ namespace Development.Scripts.PlayerCar
             }
             
             float direction = inputX != 0 ? inputX / Mathf.Abs(inputX) : 0; // Ensures that we only get -1, 0, or 1.
-            SplineFollower.motion.offset += new Vector2(0.05f * direction, 0f);
+            SplineFollower.motion.offset += new Vector2(xMoveSpeed * direction, 0f);
 
             // We make sure the car doesn't go off the tracks.
             SplineFollower.motion.offset = new Vector2(
