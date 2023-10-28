@@ -18,7 +18,7 @@ namespace Development.Scripts.Utilities
         public Vector3 GetCurrentInput()
         {
             Vector3 input = new(_floatingJoystick.Horizontal, 0f, 0f);
-            return input;
+            return input.normalized;
         }
         
         /// <summary>

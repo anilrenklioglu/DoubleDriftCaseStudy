@@ -9,9 +9,12 @@ namespace Development.Scripts.ScriptableObjects
         
         [SerializeField] private float spawnInterval;
         [SerializeField] private float spawnRate;
+        [SerializeField] private float minimumSpawnDistance;
+        [SerializeField] private float maximumSpawnDistance;
             
         public float SpawnInterval => spawnInterval;
-
         public float SpawnRate => spawnRate;
+        public float MinimumSpawnDistance => minimumSpawnDistance;
+        public float MaximumSpawnDistance => maximumSpawnDistance;
     }
 }

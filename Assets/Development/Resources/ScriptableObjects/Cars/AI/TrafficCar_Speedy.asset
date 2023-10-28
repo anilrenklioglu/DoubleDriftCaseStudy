@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86c1f2c325c540619f27ca2b7b1d59c3, type: 3}
   m_Name: TrafficCar_Speedy
   m_EditorClassIdentifier: 
-  maximumSpeed: 40
-  baseMoveSpeed: 10
+  maximumSpeed: 50
+  baseMoveSpeed: 15
   maximumSpeedDuration: 2
-  acceleration: 4
+  acceleration: 5

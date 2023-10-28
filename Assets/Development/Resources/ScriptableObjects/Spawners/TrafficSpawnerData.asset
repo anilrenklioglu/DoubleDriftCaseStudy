@@ -12,5 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d07b8e9f96314b008f8bf2d2d0f6e86f, type: 3}
   m_Name: TrafficSpawnerData
   m_EditorClassIdentifier: 
-  spawnInterval: 3
+  spawnInterval: 1.5
   spawnRate: 1
+  minimumSpawnDistance: 35
+  maximumSpawnDistance: 80

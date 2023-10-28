@@ -1,6 +1,9 @@
-﻿using DG.Tweening;
+﻿using System;
+using DG.Tweening;
 using Development.Scripts.BaseClasses;
+using Development.Scripts.Managers;
 using Development.Scripts.Utilities;
+using Dreamteck.Splines;
 using UnityEngine;
 
 namespace Development.Scripts.PlayerCar
@@ -20,7 +23,7 @@ namespace Development.Scripts.PlayerCar
         [Space(4)]
         
         [SerializeField] private float maxDriftAngle = 25f; // Maximum angle the car can reach while drifting.
-        [SerializeField] private float rotationDuration = 0.3f; // How quickly the car reaches the maximum drift angle.
+        [SerializeField] private float rotationDuration = 1f; // How quickly the car reaches the maximum drift angle.
         [SerializeField] private Ease rotationEase = Ease.OutQuart; // Type of easing for the rotation animation.
         
         // Internal variables for handling movement
@@ -40,11 +43,14 @@ namespace Development.Scripts.PlayerCar
         protected override void Awake()
         {
             base.Awake();
+            SplineFollower = GetComponent<SplineFollower>();
+            SplineFollower.followSpeed = BaseMoveSpeed;
             _inputReader = new InputReader();
         }
-
         private void Update()
         {
+            if(GameManager.Instance.CurrentState != GameState.Playing) return;
+            
             timeSinceLastCheck += Time.deltaTime;
 
             if (timeSinceLastCheck >= inputCheckInterval)
@@ -102,6 +108,6 @@ namespace Development.Scripts.PlayerCar
                 SplineFollower.motion.offset.y
             );
         }
-
+        
     }
 }
