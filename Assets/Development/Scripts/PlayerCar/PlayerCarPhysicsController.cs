@@ -158,7 +158,6 @@ namespace Development.Scripts.PlayerCar
 
         private float GetSteering()
         {
-            
             Vector3 currentInput = _inputReader.GetCurrentInput();
             return Mathf.Clamp(currentInput.x, -1, 1);
         }

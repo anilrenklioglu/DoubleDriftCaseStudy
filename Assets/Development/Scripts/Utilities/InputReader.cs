@@ -6,6 +6,11 @@ namespace Development.Scripts.Utilities
     {
         private readonly Joystick _floatingJoystick;
         
+        public bool MouseDown => Input.GetMouseButtonDown(0);
+        public bool MouseUp => Input.GetMouseButtonUp(0);
+        
+        public bool MousePressed => Input.GetMouseButton(0);
+        
         public InputReader()
         {
             _floatingJoystick = Object.FindObjectOfType<Joystick>();
@@ -20,6 +25,8 @@ namespace Development.Scripts.Utilities
             Vector3 input = new(_floatingJoystick.Horizontal, 0f, 0f);
             return input.normalized;
         }
+        
+        
         
         /// <summary>
         /// Checks if the screen is being touched.

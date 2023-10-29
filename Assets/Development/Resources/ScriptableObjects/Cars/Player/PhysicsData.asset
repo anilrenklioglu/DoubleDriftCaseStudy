@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a52a8348be9428c97129f49989d7631, type: 3}
   m_Name: PhysicsData
   m_EditorClassIdentifier: 
-  throttle: 4
+  throttle: 5
   drag: 0.05
   driveForce: 12
   activeVisualSteeringAngleEffect: 60
   maxVisualSteeringSpeed: 20
   maxVisualSteeringAngle: 70
-  maxAngularAcceleration: 3500
+  maxAngularAcceleration: 3200
   driftAngleThreshold: 10

@@ -12,6 +12,7 @@ namespace Development.Scripts.UIViews
         {
             playAgainButton.onClick.AddListener(() => ViewManager.Show<MainPanelView>());
             playAgainButton.onClick.AddListener(() => GameManager.Instance.ProgressGameStateInvoker());
+            playAgainButton.onClick.AddListener(() => GameManager.Instance.RestartGame());
         }
     }
 }

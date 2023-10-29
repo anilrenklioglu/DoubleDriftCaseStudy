@@ -4,6 +4,7 @@ using Development.Scripts.BaseClasses;
 using Development.Scripts.Managers;
 using Development.Scripts.Utilities;
 using Dreamteck.Splines;
+using Unity.VisualScripting.Antlr3.Runtime.Tree;
 using UnityEngine;
 
 namespace Development.Scripts.PlayerCar
@@ -17,7 +18,6 @@ namespace Development.Scripts.PlayerCar
         [SerializeField] private GameObject carLeftTire;
         [SerializeField] private GameObject carRightTire;
         [SerializeField] private float xMoveSpeed =0.1f; // Maximum angle the car can reach while drifting.
-        
         
         [Header("Variables for drifting")]
         [Space(4)]
@@ -40,7 +40,8 @@ namespace Development.Scripts.PlayerCar
         private float _maxOffset = 2f;
         private float _minOffset = -2f;
         
-        private Vector3 _initialPosition;
+        private float lastMouseX;
+        private float firstMouseX;
 
         protected override void Awake()
         {
@@ -56,12 +57,6 @@ namespace Development.Scripts.PlayerCar
         {
             GameManager.Instance.OnGameStateChanged -= HandleCarStates;
         }
-
-        private void Start()
-        {
-            _initialPosition = transform.position;
-        }
-
         private void HandleCarStates(GameState currentGameState)
         {
             if (currentGameState == GameState.Playing)
@@ -72,7 +67,6 @@ namespace Development.Scripts.PlayerCar
             switch (currentGameState)
             {
                 case GameState.Prepare:
-                    
                     break;
                 
                 case GameState.Playing:
@@ -81,25 +75,43 @@ namespace Development.Scripts.PlayerCar
                 
                 case GameState.Won:
                     SplineFollower.follow = false;
+                    
                     break;
-                
                 case GameState.GameOver:
-                    transform.position = _initialPosition;
                     SplineFollower.follow = false;
-                    carBody.SetActive(false);
-                    transform.position = _initialPosition;
-                    carBody.transform.rotation = Quaternion.Euler(Vector3.zero);
-                    transform.rotation = Quaternion.Euler(Vector3.zero);
-                    carBody.SetActive(true);
-                    SplineFollower.motion.offset = Vector2.zero;
-                    SplineFollower.Rebuild();
                     break;
             }
         }
 
         private void Update()
         {
-            if(GameManager.Instance.CurrentState != GameState.Playing) return;
+            if (GameManager.Instance.CurrentState != GameState.Playing) return;
+            
+            float deltaX = 0;
+            
+            if (_inputReader.MouseDown)
+            {
+                firstMouseX = Input.mousePosition.x;
+            }
+            else if (_inputReader.MousePressed)
+            {
+                lastMouseX = Input.mousePosition.x;
+                deltaX = lastMouseX - firstMouseX;
+                carBody.transform.localPosition = Vector3.Lerp(carBody.transform.localPosition ,carBody.transform.localPosition + 
+                    new Vector3(deltaX*xMoveSpeed, 0f,0),20*Time.deltaTime);
+                
+                carBody.transform.localPosition = new Vector3(
+                    Mathf.Clamp(carBody.transform.localPosition.x, _minOffset, _maxOffset),
+                    carBody.transform.localPosition.y,
+                    carBody.transform.localPosition.z
+                );
+                firstMouseX = lastMouseX;
+                HorizontalRotate(deltaX);
+            }
+            else
+            {
+                HorizontalRotate(0);
+            }
             
             timeSinceLastCheck += Time.deltaTime;
 
@@ -108,15 +120,13 @@ namespace Development.Scripts.PlayerCar
                 CheckInput();
                 timeSinceLastCheck = 0f;
             }
-
-            SplineFollower.followSpeed = Mathf.SmoothDamp(SplineFollower.followSpeed, _targetSpeed, ref _velocity, _smoothTime);
-            HandleLateralMovement();
             
+            SplineFollower.followSpeed = Mathf.SmoothDamp(SplineFollower.followSpeed, _targetSpeed, ref _velocity, _smoothTime);
         }
 
         private void CheckInput()
         {
-            bool isTouched = _inputReader.IsScreenTouched();
+            bool isTouched = _inputReader.MousePressed;
 
             if (isTouched)
             {
@@ -127,7 +137,7 @@ namespace Development.Scripts.PlayerCar
                 _targetSpeed = BaseMoveSpeed;
             }
         }
-
+        
         private void HandleLateralMovement()
         {
             float inputX = _inputReader.GetCurrentInput().x;
@@ -150,7 +160,7 @@ namespace Development.Scripts.PlayerCar
             }
             
             float direction = inputX != 0 ? inputX / Mathf.Abs(inputX) : 0; // Ensures that we only get -1, 0, or 1.
-            SplineFollower.motion.offset += new Vector2(xMoveSpeed * direction, 0f);
+            //SplineFollower.motion.offset += new Vector2(xMoveSpeed * direction, 0f);
 
             // We make sure the car doesn't go off the tracks.
             SplineFollower.motion.offset = new Vector2(
@@ -158,6 +168,30 @@ namespace Development.Scripts.PlayerCar
                 SplineFollower.motion.offset.y
             );
         }
-        
+
+        private float ClampAngle(float angle)
+        {
+            if(angle>180)
+                angle-=360;
+            
+            angle = Mathf.Clamp(angle, -maxDriftAngle, maxDriftAngle);
+            return angle;
+        }
+
+        private void HorizontalRotate(float xAngle)
+        {
+            Vector3 euler = carBody.transform.localEulerAngles;
+
+            if (xAngle == 0)
+            {
+                euler.y = Mathf.LerpAngle(euler.y,0, Time.deltaTime*1);
+
+            }
+            else
+                euler.y = Mathf.LerpAngle(euler.y,euler.y - xAngle, Time.deltaTime*20);
+            euler.y = ClampAngle(euler.y);
+            carBody.transform.localEulerAngles = euler;
+          
+        }
     }
 }

@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: TrafficCar_Speedy
   m_EditorClassIdentifier: 
   maximumSpeed: 50
-  baseMoveSpeed: 15
+  baseMoveSpeed: 45
   maximumSpeedDuration: 2
   acceleration: 5

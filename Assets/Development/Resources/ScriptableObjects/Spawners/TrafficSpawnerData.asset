@@ -13,6 +13,5 @@ MonoBehaviour:
   m_Name: TrafficSpawnerData
   m_EditorClassIdentifier: 
   spawnInterval: 1.5
-  spawnRate: 1
   minimumSpawnDistance: 35
-  maximumSpawnDistance: 80
+  maximumSpawnDistance: 300

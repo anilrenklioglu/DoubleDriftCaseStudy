@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: TrafficCar_White
   m_EditorClassIdentifier: 
   maximumSpeed: 30
-  baseMoveSpeed: 5
+  baseMoveSpeed: 45
   maximumSpeedDuration: 3
   acceleration: 3

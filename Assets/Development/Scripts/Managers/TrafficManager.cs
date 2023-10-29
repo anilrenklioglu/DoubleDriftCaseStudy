@@ -27,12 +27,12 @@ namespace Development.Scripts.Managers
 
         private void Start()
         {
-            GameManager.Instance.OnGameStateChanged += RemoveTrafficCarList;
+            GameManager.OnGameEnd += RemoveTrafficCarList;
         }
 
         private void OnDestroy()
         {
-            GameManager.Instance.OnGameStateChanged -= RemoveTrafficCarList;
+            GameManager.OnGameEnd -= RemoveTrafficCarList;
         }
         
         public void AddTrafficCar(GameObject trafficCar)
@@ -45,17 +45,14 @@ namespace Development.Scripts.Managers
             _trafficCars.Remove(trafficCar);
         }
         
-        private void RemoveTrafficCarList(GameState gameState)
+        private void RemoveTrafficCarList()
         {
-            if (gameState is GameState.Prepare or GameState.GameOver)
+            foreach (var car in _trafficCars)
             {
-                foreach (var car in _trafficCars)
-                {
-                    Pool.Instance.DeactivateObject(car, PoolItemType.TrafficCar_White);
-                }
-            
-                _trafficCars.Clear();    
+                Pool.Instance.DeactivateObject(car, PoolItemType.TrafficCar_White);
             }
+            
+            _trafficCars.Clear();
         }
     }
 }

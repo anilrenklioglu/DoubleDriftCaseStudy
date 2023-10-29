@@ -46,29 +46,21 @@ namespace Development.Scripts.Managers
         
         private void ProgressGameState()
         {
-            switch (CurrentState)
+            CurrentState = CurrentState switch
             {
-                case GameState.Prepare:
-                    CurrentState = GameState.Playing;
-                    break;
-                case GameState.Playing:
-                    CurrentState = _isGameWon ? GameState.Won : GameState.GameOver;
-                    break;
-                case GameState.Won:
-                    CurrentState = GameState.Prepare;
-                    break;
-                case GameState.GameOver:
-                    CurrentState = GameState.Prepare;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+                GameState.Prepare => GameState.Playing,
+                GameState.Playing => _isGameWon ? GameState.Won : GameState.GameOver,
+                GameState.Won => GameState.Prepare,
+                GameState.GameOver => GameState.Prepare,
+                _ => throw new ArgumentOutOfRangeException()
+            };
 
             GameStateChanged(CurrentState);
         }
         
         public void RestartGame()
         {
+            OnGameEnd?.Invoke();
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
         
@@ -79,7 +71,9 @@ namespace Development.Scripts.Managers
         public Action<GameState> OnGameStateChanged;
         public void GameStateChanged(GameState gameState) => OnGameStateChanged?.Invoke(gameState);
 
+        public static event Action OnGameEnd;
+
         #endregion
-        
+
     }
 }
