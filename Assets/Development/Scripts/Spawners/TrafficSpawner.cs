@@ -65,6 +65,7 @@ namespace Development.Scripts.Spawners
 
             TrafficCarController newTrafficCar = Pool.Instance.SpawnObject(spawnPosition, PoolItemType.TrafficCar_White, transform, Quaternion.identity).GetComponent<TrafficCarController>();
 
+            TrafficManager.Instance.AddTrafficCar(newTrafficCar.gameObject);
         }
 
 

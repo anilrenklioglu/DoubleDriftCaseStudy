@@ -7,27 +7,32 @@ namespace Development.Scripts.Managers
 {
     public class UIManager : MonoBehaviour
     {
-        [Header("UI Elements")]
+        [Header("UI Panels")]
         [Space(4)]
         
         [SerializeField] private GameObject mainMenuPanel;
+        [SerializeField] private GameObject failPanel;
+
+        [Header("UI Button References")]
+        [Space(4)]
+
         [SerializeField] private Button startButton;
+        [SerializeField] private Button tryAgainButton;
 
         private void Awake()
         {
-            startButton.onClick.AddListener(StartButtonClicked);
-            GameManager.OnGameStateChanged += GameStateChanged;
+            startButton.onClick.AddListener(ButtonClicked);
+            tryAgainButton.onClick.AddListener(ButtonClicked);
+            GameManager.Instance.OnGameStateChanged += GameStateChanged;
         }
 
         private void OnDestroy()
         {
-            startButton.onClick.RemoveListener(StartButtonClicked);
-            GameManager.OnGameStateChanged -= GameStateChanged;
+            startButton.onClick.RemoveListener(ButtonClicked);
+            tryAgainButton.onClick.RemoveListener(ButtonClicked);
+            GameManager.Instance.OnGameStateChanged -= GameStateChanged;
         }
-
-        
-
-        private void StartButtonClicked()
+        private void ButtonClicked()
         {
             GameManager.Instance.ProgressGameStateInvoker();
         }
@@ -38,6 +43,7 @@ namespace Development.Scripts.Managers
             {
                 case GameState.Prepare:
                     OpenMainMenu();
+                    CloseFailPanel();
                     break;
                 case GameState.Playing:
                     CloseMainMenu();
@@ -45,6 +51,7 @@ namespace Development.Scripts.Managers
                 case GameState.Won:
                     break;
                 case GameState.GameOver:
+                    OpenFailPanel();
                     break;
             }
         }
@@ -57,6 +64,14 @@ namespace Development.Scripts.Managers
         private void CloseMainMenu()
         {
             mainMenuPanel.SetActive(false);
+        }
+        private void OpenFailPanel()
+        {
+            failPanel.SetActive(true);
+        }
+        private void CloseFailPanel()
+        {
+            failPanel.SetActive(false);
         }
         
     }

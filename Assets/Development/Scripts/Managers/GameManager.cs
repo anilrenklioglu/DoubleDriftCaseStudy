@@ -2,6 +2,7 @@
 using Development.Scripts.Utilities;
 using Dreamteck.Splines;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Development.Scripts.Managers
 {
@@ -9,9 +10,12 @@ namespace Development.Scripts.Managers
     { 
         public static GameManager Instance { get; private set; }
         
+        [SerializeField] private SplineComputer splineComputer;
         [SerializeField] private GameObject player;
         
         [field: SerializeField] public GameState CurrentState { get; private set; }
+        
+        private bool _isGameWon;
         private void Awake()
         {
             if (Instance == null)
@@ -23,6 +27,16 @@ namespace Development.Scripts.Managers
             {
                 Destroy(gameObject);
             }
+        }
+        
+        private void Start()
+        {
+            CurrentState = GameState.Prepare;
+        }
+        
+        public void SetGameWon(bool isGameWon)
+        {
+            _isGameWon = isGameWon;
         }
         
         public float GetPlayerZPos()
@@ -38,7 +52,7 @@ namespace Development.Scripts.Managers
                     CurrentState = GameState.Playing;
                     break;
                 case GameState.Playing:
-                    CurrentState = GameState.GameOver;
+                    CurrentState = _isGameWon ? GameState.Won : GameState.GameOver;
                     break;
                 case GameState.Won:
                     CurrentState = GameState.Prepare;
@@ -57,8 +71,8 @@ namespace Development.Scripts.Managers
         
         #region GameManager Events
 
-        public static Action<GameState> OnGameStateChanged;
-        public static void GameStateChanged(GameState gameState) => OnGameStateChanged?.Invoke(gameState);
+        public Action<GameState> OnGameStateChanged;
+        public void GameStateChanged(GameState gameState) => OnGameStateChanged?.Invoke(gameState);
 
         #endregion
         

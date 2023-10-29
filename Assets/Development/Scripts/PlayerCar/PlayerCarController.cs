@@ -26,7 +26,7 @@ namespace Development.Scripts.PlayerCar
         [SerializeField] private float rotationDuration = 1f; // How quickly the car reaches the maximum drift angle.
         [SerializeField] private Ease rotationEase = Ease.OutQuart; // Type of easing for the rotation animation.
         
-        // Internal variables for handling movement
+        // Internal variables for handling movement.
         private InputReader _inputReader;
         private float _velocity = 0.0f;
         private float _smoothTime = 0.2f;
@@ -36,9 +36,11 @@ namespace Development.Scripts.PlayerCar
         private float inputCheckInterval = 0.1f;
         private float timeSinceLastCheck = 0.0f;
 
-        // Positional boundaries for movement
+        // Positional boundaries for movement.
         private float _maxOffset = 2f;
         private float _minOffset = -2f;
+        
+        private Vector3 _initialPosition;
 
         protected override void Awake()
         {
@@ -46,7 +48,55 @@ namespace Development.Scripts.PlayerCar
             SplineFollower = GetComponent<SplineFollower>();
             SplineFollower.followSpeed = BaseMoveSpeed;
             _inputReader = new InputReader();
+            
+            GameManager.Instance.OnGameStateChanged += HandleCarStates;
         }
+
+        private void OnDestroy()
+        {
+            GameManager.Instance.OnGameStateChanged -= HandleCarStates;
+        }
+
+        private void Start()
+        {
+            _initialPosition = transform.position;
+        }
+
+        private void HandleCarStates(GameState currentGameState)
+        {
+            if (currentGameState == GameState.Playing)
+            {
+                SplineFollower.follow = true;
+            }
+
+            switch (currentGameState)
+            {
+                case GameState.Prepare:
+                    
+                    break;
+                
+                case GameState.Playing:
+                    SplineFollower.follow = true;
+                    break;
+                
+                case GameState.Won:
+                    SplineFollower.follow = false;
+                    break;
+                
+                case GameState.GameOver:
+                    transform.position = _initialPosition;
+                    SplineFollower.follow = false;
+                    carBody.SetActive(false);
+                    transform.position = _initialPosition;
+                    carBody.transform.rotation = Quaternion.Euler(Vector3.zero);
+                    transform.rotation = Quaternion.Euler(Vector3.zero);
+                    carBody.SetActive(true);
+                    SplineFollower.motion.offset = Vector2.zero;
+                    SplineFollower.Rebuild();
+                    break;
+            }
+        }
+
         private void Update()
         {
             if(GameManager.Instance.CurrentState != GameState.Playing) return;
