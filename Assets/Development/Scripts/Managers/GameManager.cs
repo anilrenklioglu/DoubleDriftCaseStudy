@@ -67,6 +67,11 @@ namespace Development.Scripts.Managers
             GameStateChanged(CurrentState);
         }
         
+        public void RestartGame()
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
+        
         public void ProgressGameStateInvoker() => ProgressGameState();
         
         #region GameManager Events
