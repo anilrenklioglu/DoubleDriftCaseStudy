@@ -5,30 +5,30 @@ namespace Development.Scripts.Tests
     public class TestCarSuspension : MonoBehaviour
     {
         public LayerMask roadLayer;
-    public Transform FLWheel;
-    float FLLastDistance = 0;
-    public Transform FRWheel;
-    float FRLastDistance = 0;
-    public Transform BLWheel;
-    float BLLastDistance = 0;
-    public Transform BRWheel;
-    float BRLastDistance = 0;
-    public float verticalOffset = 0;
-    public float verticalWheelVisualOffset = 0;
+        public Transform FLWheel;
+        float FLLastDistance = 0;
+        public Transform FRWheel;
+        float FRLastDistance = 0;
+        public Transform BLWheel;
+        float BLLastDistance = 0;
+        public Transform BRWheel;
+        float BRLastDistance = 0;
+        public float verticalOffset = 0;
+        public float verticalWheelVisualOffset = 0;
 
-    public float maxDistance = 0.5f;
-    public float minDistance = -0.5f;
-    public float springConstant = 1;
-    public float maxForce = 10;
-    public float dampingConstant = 0.1f;
+        public float maxDistance = 0.5f;
+        public float minDistance = -0.5f;
+        public float springConstant = 1;
+        public float maxForce = 10;
+        public float dampingConstant = 0.1f;
 
-    Rigidbody _rb;
-    void Start()
-    {
-        _rb = GetComponent<Rigidbody>();
-    }
+        Rigidbody _rb;
+        void Start()
+        {
+            _rb = GetComponent<Rigidbody>();
+         }
 
-    void FixedUpdate()
+    private void FixedUpdate()
     {
         // Physics.Raycast(FLWheelOrigin.position, -transform.up, wheelRadius);
         ApplyWheelSupport(FLWheel, FLLastDistance);

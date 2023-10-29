@@ -11,7 +11,12 @@ namespace Development.Scripts.Destroyer
             {
                 TrafficManager.Instance.RemoveTrafficCar(other.gameObject);
                 Pool.Instance.DeactivateObject(other.gameObject, PoolItemType.TrafficCar_White);
-                
+            }
+            
+            else if (other.CompareTag("Player"))
+            {
+                GameManager.Instance.SetGameWon(true);
+                GameManager.Instance.ProgressGameStateInvoker();
             }
         }
     }
