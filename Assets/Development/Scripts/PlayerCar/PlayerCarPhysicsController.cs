@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Development.Scripts.Managers;
 using Development.Scripts.ScriptableObjects;
 using Development.Scripts.Utilities;
 using UnityEngine;
@@ -52,6 +53,8 @@ namespace Development.Scripts.PlayerCar
 
         private void Update()
         {
+            if (GameManager.Instance.CurrentState != GameState.Playing) return;
+          
             float wheelAngle = -Vector3.Angle(_rb.velocity.normalized, GetDriveDirection()) * Vector3.Cross(_rb.velocity.normalized, GetDriveDirection()).y;
         
             wheelAngle = Mathf.Min(Mathf.Max(-maxVisualSteeringAngle, wheelAngle), maxVisualSteeringAngle);
@@ -62,17 +65,16 @@ namespace Development.Scripts.PlayerCar
 
         }
 
+        //Adjusts the car's position in the game world, specifically the x-coordinate
         private void ClampPosition()
         {
-            // Get the current position of the car.
             Vector3 position = transform.position;
 
-            // Adjust the x position to be within the range -2.5 to 2.5.
             position.x = Mathf.Clamp(position.x, -2.5f, 2.5f);
 
-            // Set the position back.
             transform.position = position;
         }
+        //Calculate the car's drift angle, which is the angle between the car's velocity and the direction it's facing
         private float GetRawDriftAngle()
         {
             if (! WheelsGrounded()) return 0;
@@ -84,6 +86,7 @@ namespace Development.Scripts.PlayerCar
             return GetRawDriftAngle();
         } 
 
+        //Checks if the drift angle exceeds a certain threshold
         public bool IsFrontWheelDrift()
         {
             return Mathf.Abs(GetDriftAngle()) > maxVisualSteeringAngle;
@@ -96,8 +99,9 @@ namespace Development.Scripts.PlayerCar
 
         private void FixedUpdate()
         {
-            // Body adjustments.
-            _rb.centerOfMass = centerOfMass.localPosition;  // Adjusting each frame allows for live editing in the inspector.
+            if (GameManager.Instance.CurrentState != GameState.Playing) return;
+            
+            _rb.centerOfMass = centerOfMass.localPosition;
             _rb.AddForce(-GetDragForce() * _rb.velocity.normalized);
 
             // If rear wheels are on the ground, the car can apply forces for movement and steering.
@@ -113,20 +117,14 @@ namespace Development.Scripts.PlayerCar
             // When drifting, control the maximum rotation along the y-axis to 45 degrees.
             if (IsDrifting())
             {
-                // Current rotation.
                 Quaternion currentRotation = transform.rotation;
-
-                // Determine the left and right boundary for the 45-degree clamping.
                 Quaternion leftBoundaryRotation = Quaternion.Euler(0, -45, 0);
                 Quaternion rightBoundaryRotation = Quaternion.Euler(0, 45, 0);
 
-                // Choose the closest boundary to determine the direction to clamp towards.
                 Quaternion targetRotation = (Quaternion.Angle(currentRotation, leftBoundaryRotation) < Quaternion.Angle(currentRotation, rightBoundaryRotation)) ? leftBoundaryRotation : rightBoundaryRotation;
 
-                // Smoothly rotate towards the target rotation.
                 Quaternion newRotation = Quaternion.RotateTowards(currentRotation, targetRotation, maxAngularAcceleration * Time.fixedDeltaTime);
 
-                // Apply the rotation if it's within the limits, to prevent overshooting.
                 if (Quaternion.Angle(newRotation, leftBoundaryRotation) >= 0 && Quaternion.Angle(newRotation, rightBoundaryRotation) <= 0)
                 {
                     transform.rotation = newRotation;
@@ -134,12 +132,8 @@ namespace Development.Scripts.PlayerCar
             } 
         }
 
-
-        /// Point the drive wheels at angle
-        /// angle relative to car direction
-        /// angle = 0 means wheels point forward
-        /// Does it smoothly
-        void PointDriveWheelsAt(float targetAngle)
+        //Gradually adjusts the steering wheels' orientation towards a target angle, creating a smooth steering visual effect.
+        private void PointDriveWheelsAt(float targetAngle)
         {
             foreach (Transform wheel in steeringWheels)
             {
@@ -149,49 +143,44 @@ namespace Development.Scripts.PlayerCar
                 wheel.localEulerAngles = new Vector3(0, newAngle, 0);
             }
         }
-
-        /// Are the drive wheels grounded
-        /// Can the car accelerate?
+        
+        //Checks whether the drive wheels are in contact with the ground, influencing whether certain forces or controls should be applied
         public bool WheelsGrounded()
         {
             return Physics.OverlapBox(groundTrigger.position, groundTrigger.localScale / 2, Quaternion.identity, wheelCollidables).Length > 0;
         }
-
-        /// How fast do we spin car?
+        
+        //Computes the angular acceleration for steering based on input and certain physics parameters. This helps in turning the car.
         private float GetSteeringAngularAcceleration()
         {
             return GetSteering() * maxAngularAcceleration * Mathf.PI / 180;
         }
 
-        /// How much should we be turning?
-        /// Between -1 and 1
-        float GetSteering()
+        private float GetSteering()
         {
-            // Retrieve the current input from the InputReader instance
+            
             Vector3 currentInput = _inputReader.GetCurrentInput();
-
-            // Return the horizontal component of the input (which is X in your Vector3 structure)
             return Mathf.Clamp(currentInput.x, -1, 1);
         }
-
-        /// What way car pointing
-        /// Is normalized
+        
         Vector3 GetDriveDirection()
         {
             return _rb.transform.forward.normalized;
         }
 
-        /// How many beans will the car push itself with
-        /// in newtown
-        float GetDriveForce()
+        private float GetDriveForce()
         {
             return driveForce * throttle;
         }
 
-        /// Magnitude of drag
-        /// velocity squared times drag coefficient
-        /// Uses overall velocity, doesn't care about what direction car pointing
-        float GetDragForce()
+        /// <summary>
+        /// The reason for squaring the velocity here is based on the physics formula for drag force, which is proportional to the square of speed.
+        /// This relationship implies that as the car goes faster, the resistance (drag force) increases exponentially
+        /// </summary>
+        /// <returns></returns>
+        
+        //Computes the resistance force acting against the car based on its velocity. It simulates real-world drag or air resistance.
+        private float GetDragForce()
         {
             return Mathf.Pow(_rb.velocity.magnitude, 2) * drag;
         }
